@@ -1,11 +1,30 @@
-from flask import Flask , render_template, redirect
+from flask import Flask , render_template, redirect, request
 from flask.templating import render_template
+import mysql.connector
 # from passlib.hash import sha256_crypt
+
+mydb = mysql.connector.connect(
+    host = 'localhost',
+    username = 'root',
+    passwd = '@Hm$d_2001',
+    database = 'radiology'
+    )
+mycursor = mydb.cursor()
 app=Flask(__name__)
 
-@app.route('/')
+@app.route('/',methods = ['POST', 'GET'])
 def index():
-    return render_template('signin.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['username']
+        mycursor.execute('SELECT * from credentials')
+        orig = mycursor.fetchone()
+        if (username == orig[0]) and (password == orig[1]):
+            return render_template('home.html')
+        else:
+            return render_template('signin.html')
+    else:
+        return render_template('signin.html')
 
 @app.route('/home')
 def home():
