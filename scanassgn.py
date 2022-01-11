@@ -113,12 +113,16 @@ def scanassign(scandate, scantype, id):
 		WHERE Machines.TYPE="{scantype}" AND Rooms.AVAILABLE = '1'
 		ORDER BY Rooms.ID''')
 		roomid= mycursor.fetchone()
+
+
 	if isinstance(drid, tuple):
 		drid=drid[0]
 	if isinstance(nurid, tuple):
 		nurid=nurid[0]
 	if isinstance(roomid, tuple):
 		roomid=roomid[0]
+
+
 	if (drid) and (nurid) and (roomid):
 		sql = 'INSERT INTO current_scans(PAT_ID, DATE, TYPE, DR_ID, NUR_ID, ROOM_ID) VALUES (%s, %s, %s, %s, %s, %s)'
 		val = (id[0], scandate, scantype, int(drid), int(nurid), int(roomid))

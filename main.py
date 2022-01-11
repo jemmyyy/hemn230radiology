@@ -10,7 +10,6 @@ import re
 
 isLoggedIn=False
 typeL=''
-totalHrs=0
 currentuser=''
 mydb = mysql.connector.connect(
 	host = 'localhost',
@@ -29,7 +28,6 @@ def signin():
 		if request.method == 'POST':
 			user = request.form['username']
 			passwd = request.form['password']
-			# cred = (user, passwd, signtype)
 			mycursor.execute("SELECT * FROM users WHERE username='" + user + "' and password='" + passwd + "'")
 			data=mycursor.fetchone()
 			if data is not None:
@@ -112,8 +110,7 @@ def is_logged_ina(f):
         else:
             flash('Unauthorized, Please login')
             return redirect(url_for('signin'))
-    return wrap		
-    
+    return wrap		   
 
 @app.route('/home')
 def home():
@@ -171,6 +168,7 @@ def registerp():
 		return render_template('registerp.html')
 
 @app.route('/patient', methods=['POST', 'GET'])
+@is_logged_inp
 def patient():
 	try:
 		if request.method == 'POST':
@@ -525,7 +523,8 @@ def phistory():
 	res = mycursor.fetchall()
 	data = {
 		'rowheaders': rowheaders,
-		'res': res}
+		'res': res
+	}
 	return render_template('phistory.html', data = data)    
 	
 @app.route('/patient/view-reservation')
@@ -613,7 +612,7 @@ def treport():
 		''')
 		res = mycursor.fetchall()
 		mycursor.execute(f'''
-			SELECT Machines.ID, Machines.TYPE, MIssues.ISSUE
+			SELECT Machines.ID
 			FROM MIssues
 			JOIN Machines ON MIssues.MACH_ID = Machines.ID
 			WHERE MIssues.TECH_ID = {techid[0]}
@@ -638,7 +637,7 @@ def tchecks():
 			mydb.commit()
 			mycursor.execute(f"INSERT INTO Issue_History(MACH_ID, TECH_ID, ISSUE, FIX) VALUES({machid}, {techid[0]}, 'Regular Check', '{result}')")
 			mydb.commit()
-			return redirect(url_for('techecks'))
+			return redirect(url_for('tchecks'))
 		except:
 			flash('Failed to do task, report issue to IT from the contact link above')
 			return redirect(url_for('tchecks'))
